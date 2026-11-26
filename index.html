@@ -1,203 +1,314 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mohamed Bavas N – Embedded Systems / Firmware Engineer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mohamed Bavas N | Embedded Systems &amp; Firmware Engineer</title>
+<meta name="description" content="Embedded Systems and Firmware Engineer from Chennai. Embedded C, 8051, timers, interrupts, ADC, UART, SPI and I2C. Hardware Testing Engineer at Inovolve Automation.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EEF2EF; --surface:#FFFFFF; --text:#14231D; --muted:#4F625A; --line:#C9D4CE;
-  --accent:#1E5A43; --lcd-bg:#B7C77A; --lcd-ink:#1F2B12; --lcd-bezel:#16342A;
+  --bg:#f2f5f3; --surface:#e6ece8; --ink:#10302f; --muted:#4d6663; --line:#c5d2cd;
+  --signal:#2447c9; --signal-ink:#ffffff; --trace:#2447c9;
+  --sans:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
   box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#0D1F19; --surface:#13291F; --text:#E6EFE9; --muted:#9DB3A8; --line:#264236;
-    --accent:#C5D86D; --lcd-bg:#B7C77A; --lcd-ink:#1F2B12; --lcd-bezel:#08140F; color-scheme:dark;
-  }
+  :root{--bg:#0e1a19; --surface:#152624; --ink:#e3efec; --muted:#9bb3ae; --line:#27403c;
+    --signal:#7d9bff; --signal-ink:#0e1a19; --trace:#7d9bff}
 }
-:root[data-theme="dark"]{
-  --bg:#0D1F19; --surface:#13291F; --text:#E6EFE9; --muted:#9DB3A8; --line:#264236;
-  --accent:#C5D86D; --lcd-bg:#B7C77A; --lcd-ink:#1F2B12; --lcd-bezel:#08140F; color-scheme:dark;
-}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
-a{color:var(--accent);text-underline-offset:3px}
-a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
-main{max-width:760px;margin:0 auto;padding:48px 22px 72px}
-h1,h2,h3,p,ul{margin:0}
-ul{padding:0;list-style:none}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--signal);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--signal);outline-offset:3px;border-radius:4px}
+.wrap{max-width:880px;margin:0 auto;padding:0 24px}
+
+/* top bar */
+header.bar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
+.bar b{font-weight:800;letter-spacing:-.01em}
+.bar nav{display:flex;gap:18px;overflow-x:auto}
+.bar nav a{color:var(--muted);text-decoration:none;font-weight:500;font-size:.95rem;white-space:nowrap}
+.bar nav a:hover{color:var(--ink)}
 
 /* hero */
-.lcd{background:var(--lcd-bezel);padding:14px;border-radius:10px;max-width:520px}
-.lcd-screen{background:var(--lcd-bg);color:var(--lcd-ink);border-radius:4px;padding:14px 16px;
-  font:500 clamp(15px,4.6vw,26px)/1.45 "IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-  letter-spacing:.06em;box-shadow:inset 0 2px 6px rgba(0,0,0,.35);min-height:3.1em}
-.lcd-screen div{white-space:pre;min-height:1.45em}
-.cur{display:inline-block;width:.6em;height:1.1em;background:var(--lcd-ink);vertical-align:-.15em;animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-h1{font-size:clamp(30px,6vw,44px);line-height:1.15;font-weight:600;margin-top:28px;letter-spacing:-.01em}
-.lead{margin-top:12px;color:var(--muted);max-width:60ch}
-.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
-.btn{display:inline-block;padding:9px 16px;border-radius:6px;border:1.5px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:500}
-.btn.fill{background:var(--accent);color:var(--bg)}
-.btn:hover{opacity:.85}
+.hero{padding:72px 0 48px}
+.hero h1{font-size:clamp(2.6rem,8vw,4.8rem);line-height:1;letter-spacing:-.035em;font-weight:800;margin:0 0 20px}
+.hero .role{font-size:clamp(1.15rem,2.6vw,1.45rem);font-weight:500;margin:0 0 18px;color:var(--ink)}
+.hero p.lead{max-width:60ch;color:var(--muted);margin:0 0 28px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-block;padding:12px 22px;border-radius:8px;font-weight:700;text-decoration:none;border:2px solid var(--signal)}
+.btn.primary{background:var(--signal);color:var(--signal-ink)}
+.btn.ghost{color:var(--signal)}
+.btn:hover{filter:brightness(1.08)}
+
+/* the one memorable element: a ticking time signal */
+.signal{margin-top:48px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.signal .top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.signal .clk{font-family:var(--mono);font-size:clamp(1.5rem,5vw,2.2rem);letter-spacing:.04em}
+.signal .cap{color:var(--muted);font-size:.9rem;text-align:right}
+.wave{height:72px;overflow:hidden;position:relative}
+.wave svg{position:absolute;left:0;top:0;height:72px;width:200%;animation:slide 8s linear infinite}
+@keyframes slide{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.wave svg{animation:none}html{scroll-behavior:auto}}
 
 /* sections */
-section{margin-top:56px;padding-top:22px;border-top:1px solid var(--line)}
-h2{font-size:22px;font-weight:600;margin-bottom:18px}
-.entry+.entry{margin-top:22px}
-.row{display:flex;justify-content:space-between;gap:6px 16px;flex-wrap:wrap;align-items:baseline}
-h3{font-size:17px;font-weight:600}
-.when{color:var(--muted);font-size:15px}
-.sub{color:var(--muted);font-style:italic}
-.entry ul{margin-top:6px}
-.entry li{padding-left:18px;position:relative;margin-top:4px}
-.entry li::before{content:"";position:absolute;left:2px;top:.75em;width:6px;height:2px;background:var(--accent)}
-dl{display:grid;grid-template-columns:minmax(0,200px) 1fr;gap:10px 20px;margin:0}
-dt{font-weight:600}
-dd{margin:0;color:var(--text)}
-.note{color:var(--muted);font-size:15px;margin-top:14px}
-@media (max-width:560px){dl{grid-template-columns:1fr;gap:2px}dd{margin-bottom:10px}}
-.contact li{margin-top:6px}
-footer{margin-top:56px;color:var(--muted);font-size:14px}
-@media (prefers-reduced-motion:reduce){.cur{animation:none}}
+section{padding:56px 0;border-top:1px solid var(--line)}
+h2{font-size:1.9rem;letter-spacing:-.02em;margin:0 0 24px;line-height:1.2}
+h3{font-size:1.2rem;margin:0;line-height:1.3}
+.meta{color:var(--muted);font-size:.95rem;margin:2px 0 10px}
+ul{padding-left:1.15rem;margin:8px 0 0}
+li{margin:6px 0}
+.about p{max-width:65ch;margin:0 0 14px}
+
+.item{display:grid;grid-template-columns:150px 1fr;gap:8px 28px;padding:0 0 32px}
+.item:last-child{padding-bottom:0}
+.item .when{color:var(--muted);font-size:.95rem;padding-top:3px}
+@media (max-width:640px){.item{grid-template-columns:1fr}}
+
+dl.skills{margin:0;display:grid;grid-template-columns:170px 1fr;gap:0}
+dl.skills dt,dl.skills dd{margin:0;padding:14px 0;border-bottom:1px solid var(--line)}
+dl.skills dt{font-weight:700}
+dl.skills dd{color:var(--muted)}
+@media (max-width:640px){dl.skills{grid-template-columns:1fr}dl.skills dt{border:0;padding-bottom:0}}
+
+.proj{padding:26px 0;border-bottom:1px solid var(--line)}
+.proj:first-of-type{padding-top:0}
+.proj .stack{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.proj .stack li{margin:0;padding:3px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.proj .links{margin:12px 0 0;font-weight:500}
+.proj .links a{margin-right:16px}
+.badge{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;background:var(--signal);color:var(--signal-ink);font-size:.8rem;font-weight:700;vertical-align:middle}
+
+.contact-list{list-style:none;padding:0;margin:0 0 8px;display:grid;gap:10px}
+.contact-list b{display:inline-block;min-width:90px}
+footer{padding:32px 0 48px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <div class="lcd" aria-hidden="true">
-      <div class="lcd-screen"><div id="l1"></div><div id="l2"></div></div>
-    </div>
-    <h1>Mohamed Bavas N</h1>
-    <p class="lead">Entry-level Embedded Systems / Firmware Engineer from Chennai. I write Embedded C for the 8051 and work close to the hardware: GPIO, timers, interrupts, ADC and serial protocols.</p>
-    <div class="cta">
-      <a class="btn fill" href="#contact">Get in touch</a>
-      <a class="btn" href="#projects">See projects</a>
-    </div>
-  </header>
 
-  <section id="about">
+<header class="bar">
+  <div class="wrap">
+    <b>Mohamed Bavas N</b>
+    <nav aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>Mohamed Bavas N</h1>
+    <p class="role">Embedded Systems &amp; Firmware Engineer, Chennai</p>
+    <p class="lead">I write Embedded C for the 8051 and work close to the hardware: GPIO, timers, interrupts, ADC and serial protocols. By day I test precision timing hardware at Inovolve Automation, and I’m building my way into firmware development.</p>
+    <div class="btns">
+      <a class="btn primary" href="#projects">See projects</a>
+      <a class="btn ghost" href="resume.pdf" download>Download resume</a>
+      <a class="btn ghost" href="#contact">Get in touch</a>
+    </div>
+
+    <div class="signal" role="img" aria-label="A live clock ticking once per second above a scrolling square wave">
+      <div class="top">
+        <span class="clk" id="clk">--:--:--</span>
+        <span class="cap">1 Hz tick, the same idea as my timer-interrupt clock</span>
+      </div>
+      <div class="wave">
+        <svg viewBox="0 0 3360 72" preserveAspectRatio="none" aria-hidden="true">
+          <path id="trace" fill="none" stroke="var(--trace)" stroke-width="3" d=""/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <section id="about" class="about">
     <h2>About</h2>
-    <p>I’m an Electronics and Communication Engineering graduate (2026) with hands-on 8051 and Embedded C experience. I’m looking for an entry-level firmware role where I can build reliable firmware, interface hardware and debug at register level, while growing into ARM Cortex-M and Linux-based embedded development.</p>
+    <p>I’m an Electronics and Communication Engineering graduate (2026) working as a Hardware Testing Engineer at Inovolve Automation, where I validate embedded precision timing products.</p>
+    <p>Testing hardware every day shows me how real signals, timing and failures behave. I’m using that to grow into firmware: building reliable code, interfacing hardware and debugging at register level, with ARM Cortex-M and Linux-based embedded development next on my list.</p>
+  </section>
+
+  <section id="experience">
+    <h2>Experience</h2>
+    <div class="item">
+      <div class="when">2026 – Present</div>
+      <div>
+        <h3>Hardware Testing Engineer</h3>
+        <p class="meta">Inovolve Automation Pvt Ltd, Chennai</p>
+        <ul>
+          <li>Test and validate embedded timing and synchronization hardware, including IRIG-B, NTP and UDP time systems and time displays.</li>
+          <li>Check signal quality, timing accuracy and product behaviour against specifications.</li>
+          <li>Debug hardware issues with the engineering team and learn where hardware ends and firmware begins.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">Aug – Nov 2026</div>
+      <div>
+        <h3>Embedded Systems Intern</h3>
+        <p class="meta">InnoKnowVex Private Limited, Bengaluru (remote)</p>
+        <ul>
+          <li>Completed a structured 3-month internship with industry-oriented training and mentor-guided project work.</li>
+          <li>Applied Embedded C and microcontroller fundamentals alongside my coursework.</li>
+        </ul>
+      </div>
+    </div>
   </section>
 
   <section id="skills">
     <h2>Skills</h2>
-    <dl>
-      <dt>Languages</dt><dd>C, Embedded C (working toward C++)</dd>
-      <dt>Microcontrollers</dt><dd>8051</dd>
-      <dt>Protocols</dt><dd>UART, SPI, I2C – a foundation that carries over to CAN, ModBus and other serial/bus protocols</dd>
+    <dl class="skills">
+      <dt>Languages</dt><dd>C, Embedded C (working towards C++)</dd>
+      <dt>Microcontrollers</dt><dd>8051 (learning ARM Cortex-M next)</dd>
+      <dt>Protocols</dt><dd>UART, SPI, I2C. A base that carries over to CAN, Modbus and other serial buses.</dd>
       <dt>Embedded concepts</dt><dd>GPIO, timers, interrupts, PWM, ADC, register-level programming, bitwise and memory manipulation</dd>
+      <dt>Testing and validation</dt><dd>Hardware testing, signal verification, timing checks, debugging</dd>
       <dt>Tools</dt><dd>Keil uVision, Proteus, Git, GitHub, VS Code</dd>
-      <dt>Operating systems</dt><dd>Windows; actively studying Linux fundamentals for embedded targets</dd>
+      <dt>Operating systems</dt><dd>Windows; studying Linux fundamentals for embedded targets</dd>
     </dl>
-  </section>
-
-  <section id="experience">
-    <h2>Internship</h2>
-    <div class="entry">
-      <div class="row"><h3>Embedded Systems Intern</h3><span class="when">Aug 2026 – Nov 2026 (ongoing)</span></div>
-      <p class="sub">InnoKnowVex Private Limited, Bengaluru (remote)</p>
-      <ul>
-        <li>Structured 3-month internship with industry-oriented training, hands-on project work and mentorship from industry professionals.</li>
-        <li>Applying core Embedded C and microcontroller fundamentals in a real, mentor-guided setting alongside my coursework.</li>
-      </ul>
-    </div>
   </section>
 
   <section id="projects">
     <h2>Projects</h2>
-    <div class="entry">
-      <h3>Door Lock System using 8051</h3>
+
+    <article class="proj">
+      <h3>Door Lock System <span class="badge">8051</span></h3>
+      <p class="meta">Password-based lock with keypad input.</p>
       <ul>
-        <li>Password-based door lock with keypad input, GPIO-driven lock/unlock output and LCD status messages.</li>
-        <li>Embedded C firmware built in Keil uVision with password verification logic; circuit validated in Proteus.</li>
+        <li>Keypad input, GPIO-driven lock and unlock output, and LCD status messages.</li>
+        <li>Password verification logic in Embedded C, built in Keil uVision and validated in Proteus.</li>
       </ul>
-    </div>
-    <div class="entry">
-      <h3>Digital Clock using 8051</h3>
+      <ul class="stack"><li>Embedded C</li><li>Keil uVision</li><li>Proteus</li><li>GPIO</li><li>Keypad</li><li>LCD</li></ul>
+      <p class="links"><a href="https://github.com/Mohamed-Bavas">Code on GitHub</a></p>
+    </article>
+
+    <article class="proj">
+      <h3>Digital Clock <span class="badge">8051</span></h3>
+      <p class="meta">Real-time clock driven by timer interrupts.</p>
       <ul>
-        <li>Real-time clock that uses timer interrupts to generate accurate one-second ticks.</li>
-        <li>Hours, minutes and seconds counting logic written in Embedded C, with the time displayed.</li>
+        <li>Timer interrupts generate accurate one-second ticks.</li>
+        <li>Hours, minutes and seconds counting logic in Embedded C, with the time shown on a display. A small-scale version of the timekeeping used in timing systems.</li>
       </ul>
-    </div>
-    <div class="entry">
+      <ul class="stack"><li>Embedded C</li><li>Timers</li><li>Interrupts</li><li>Keil uVision</li><li>Proteus</li></ul>
+      <p class="links"><a href="https://github.com/Mohamed-Bavas">Code on GitHub</a></p>
+    </article>
+
+    <article class="proj">
       <h3>Temperature Monitoring System</h3>
+      <p class="meta">LM35 sensor read through the ADC.</p>
       <ul>
-        <li>LM35 analog temperature sensor read through the ADC.</li>
-        <li>Real-time temperature shown on an LCD, using register-level ADC configuration and data conversion.</li>
+        <li>Register-level ADC configuration and data conversion.</li>
+        <li>Real-time temperature shown on an LCD.</li>
       </ul>
-    </div>
-    <div class="entry">
-      <h3>LCD Display Interfacing using 8051</h3>
+      <ul class="stack"><li>Embedded C</li><li>ADC</li><li>LM35</li><li>LCD</li></ul>
+      <p class="links"><a href="https://github.com/Mohamed-Bavas">Code on GitHub</a></p>
+    </article>
+
+    <article class="proj">
+      <h3>LCD Display Interfacing <span class="badge">8051</span></h3>
+      <p class="meta">16x2 LCD driven from scratch.</p>
       <ul>
-        <li>16x2 LCD driven by Embedded C routines for commands and data.</li>
-        <li>RS, RW and EN lines controlled through GPIO with proper timing delays to display text and characters.</li>
+        <li>Embedded C routines for LCD commands and data.</li>
+        <li>RS, RW and EN lines controlled through GPIO with correct timing delays to show text and characters.</li>
       </ul>
-    </div>
-    <div class="entry">
-      <div class="row"><h3>Nano-AES Security Algorithm for Image Cryptography</h3><span class="when">Final year project</span></div>
-      <ul><li>Lightweight AES variant (Nano-AES) for encrypting and decrypting digital images, implemented and simulated in MATLAB.</li></ul>
-    </div>
-    <div class="entry">
+      <ul class="stack"><li>Embedded C</li><li>GPIO</li><li>16x2 LCD</li><li>Timing delays</li></ul>
+      <p class="links"><a href="https://github.com/Mohamed-Bavas">Code on GitHub</a></p>
+    </article>
+
+    <article class="proj">
+      <h3>Nano-AES for Image Cryptography <span class="badge">Final year project</span></h3>
+      <p class="meta">Lightweight encryption for digital images.</p>
+      <ul>
+        <li>A lightweight AES variant (Nano-AES) for encrypting and decrypting images, implemented and simulated in MATLAB.</li>
+      </ul>
+      <ul class="stack"><li>MATLAB</li><li>AES</li><li>Cryptography</li><li>Image processing</li></ul>
+    </article>
+
+    <article class="proj">
       <h3>Embedded Firmware Roadmap</h3>
-      <ul><li>Ongoing, day-by-day self-study on <a href="https://github.com/Mohamed-Bavas">GitHub</a>: 8051 architecture, GPIO, timers, interrupts, UART, SPI and I2C, extending into ADC/DAC, PWM, CAN, watchdog timers, bootloader basics and RTOS fundamentals.</li></ul>
-    </div>
+      <p class="meta">Ongoing, day-by-day self-study.</p>
+      <ul>
+        <li>Covers 8051 architecture, GPIO, timers, interrupts, UART, SPI and I2C, then ADC/DAC, PWM, CAN, watchdog timers, bootloader basics and RTOS fundamentals.</li>
+      </ul>
+      <p class="links"><a href="https://github.com/Mohamed-Bavas">Follow along on GitHub</a></p>
+    </article>
   </section>
 
   <section id="education">
     <h2>Education</h2>
-    <div class="entry">
-      <div class="row"><h3>B.E. Electronics and Communication Engineering</h3><span class="when">2022 – 2026</span></div>
-      <p class="sub">K S Rangasamy College of Technology, Namakkal, Tamil Nadu · CGPA 7.5 / 10</p>
+    <div class="item">
+      <div class="when">2022 – 2026</div>
+      <div>
+        <h3>B.E. Electronics and Communication Engineering</h3>
+        <p class="meta">K S Rangasamy College of Technology, Namakkal, Tamil Nadu. CGPA 7.5 / 10</p>
+        <p>Coursework: Embedded Systems, Microprocessors, Digital Electronics, Analog Electronics, Communication Systems, Signals and Systems.</p>
+      </div>
     </div>
-    <div class="entry">
-      <div class="row"><h3>Diploma in Embedded Systems</h3><span class="when">In progress</span></div>
-      <p class="sub">Mirror Institute For Embedded Technology (MIET), Chennai, Tamil Nadu</p>
+    <div class="item">
+      <div class="when">In progress</div>
+      <div>
+        <h3>Diploma in Embedded Systems</h3>
+        <p class="meta">Mirror Institute For Embedded Technology (MIET), Chennai</p>
+      </div>
     </div>
-    <p class="note">Coursework: Embedded Systems, Microprocessors, Digital Electronics, Analog Electronics, Communication Systems, Signals and Systems.<br>Certifications: Industrial IoT 4.0 and Cloud Computing (NPTEL).</p>
-  </section>
-
-  <section id="achievements">
-    <h2>Achievements</h2>
-    <ul class="entry">
-      <li>Second runner-up, Anna University Zonal Hockey Tournament (2023–24)</li>
-      <li>Second runner-up, Chief Minister’s Trophy Hockey Tournament (2024)</li>
-      <li>Second runner-up, Chief Minister’s Trophy Hockey Tournament (2025)</li>
-    </ul>
+    <div class="item">
+      <div class="when">Certification</div>
+      <div>
+        <h3>Industrial IoT 4.0 and Cloud Computing</h3>
+        <p class="meta">NPTEL</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="when">Achievements</div>
+      <div>
+        <p style="margin:0">Second runner-up in three inter-collegiate and state hockey tournaments: Anna University Zonal (2023–24) and the Chief Minister’s Trophy (2024 and 2025).</p>
+      </div>
+    </div>
   </section>
 
   <section id="contact">
     <h2>Contact</h2>
-    <ul class="contact">
-      <li>Email: <a href="mailto:mohamedbavasn@gmail.com">mohamedbavasn@gmail.com</a></li>
-      <li>Phone: <a href="tel:+919025540618">+91 9025540618</a></li>
-      <li>LinkedIn: <a href="https://www.linkedin.com/in/mohamed-bavas-n-a92a8427a/">linkedin.com/in/mohamed-bavas-n-a92a8427a</a></li>
-      <li>GitHub: <a href="https://github.com/Mohamed-Bavas">github.com/Mohamed-Bavas</a></li>
+    <p style="max-width:60ch">I’m open to firmware and embedded roles, and happy to talk with anyone working in embedded systems.</p>
+    <ul class="contact-list">
+      <li><b>Email</b> <a href="mailto:mohamedbavasn@gmail.com">mohamedbavasn@gmail.com</a></li>
+      <li><b>LinkedIn</b> <a href="https://www.linkedin.com/in/mohamed-bavas-n-a92a8427a/">linkedin.com/in/mohamed-bavas-n-a92a8427a</a></li>
+      <li><b>GitHub</b> <a href="https://github.com/Mohamed-Bavas">github.com/Mohamed-Bavas</a></li>
     </ul>
   </section>
 
-  <footer>Mohamed Bavas N · Chennai, India</footer>
+</div>
 </main>
+
+<footer>
+  <div class="wrap">Mohamed Bavas N, Chennai, India</div>
+</footer>
+
 <script>
+// Square-wave trace (two repeats so the CSS slide loops seamlessly)
 (function(){
-  var a=document.getElementById('l1'),b=document.getElementById('l2');
-  var t1='MOHAMED BAVAS N',t2='EMBEDDED / FW ENG';
-  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var cur='<span class="cur"></span>';
-  if(reduce){a.textContent=t1;b.innerHTML=t2+cur;return;}
-  var i=0,j=0;
-  function s1(){a.innerHTML=t1.slice(0,++i)+(i<t1.length?cur:'');if(i<t1.length)setTimeout(s1,70);else setTimeout(s2,300);}
-  function s2(){b.innerHTML=t2.slice(0,++j)+cur;if(j<t2.length)setTimeout(s2,70);}
-  s1();
+  var d="M0 54",x=0,hi=false;
+  while(x<3360){
+    var w=hi?40:80; x+=w;
+    d+=" H"+x+" V"+(hi?54:18); hi=!hi;
+  }
+  document.getElementById("trace").setAttribute("d",d);
+})();
+// 1 Hz clock
+(function(){
+  var el=document.getElementById("clk");
+  function p(n){return n<10?"0"+n:n}
+  function tick(){var t=new Date();el.textContent=p(t.getHours())+":"+p(t.getMinutes())+":"+p(t.getSeconds())}
+  tick();setInterval(tick,1000);
 })();
 </script>
 </body>
